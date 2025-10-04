@@ -4,7 +4,7 @@ set -euo pipefail
 # --- USER INPUT ---
 DISK="/dev/sda"          # CHANGE THIS to your disk (check with `lsblk`)
 HOSTNAME="abc"           # Your hostname
-USERNAME="def"  # Your username
+USERNAME="def"           # Your username
 # -----------
 
 # Function to ask for confirmation
@@ -97,38 +97,21 @@ else
   fi
 fi
 
-# --- GENERATE HARDWARE CONFIG IF NOT EXISTS ---
-if [ ! -f "/mnt/etc/nixos/hardware-configuration.nix" ]; then
-  echo "🔧 Generating hardware config..."
-  nixos-generate-config --root /mnt
-else
-  if confirm "Hardware config already exists. Overwrite?"; then
-    echo "🔧 Overwriting hardware config..."
-    nixos-generate-config --root /mnt
-  else
-    echo "⏩ Skipping hardware config generation."
-  fi
-fi
+# --- GENERATE HARDWARE CONFIG ---
+echo "🔧 Generating hardware config..."
+mkdir -p /mnt/etc/nixos
+nixos-generate-config --root /mnt
 
 # --- HASH PASSWORDS ---
 echo "🔧 Hashing passwords..."
 USERHASH=$(mkpasswd -m sha-512 "$USERPASS")
 ROOTHASH=$(mkpasswd -m sha-512 "$ROOTPASS")
 
-# --- COPY CONFIG FILES IF NOT EXISTS ---
-if [ ! -d "/mnt/etc/nixos/hosts" ]; then
-  echo "🔧 Copying config files..."
-  mkdir -p /mnt/etc/nixos/hosts
-  mkdir -p /mnt/etc/nixos/users
-  cp -r hosts users flake.nix /mnt/etc/nixos/
-else
-  if confirm "Config files already exist. Overwrite?"; then
-    echo "🔧 Overwriting config files..."
-    cp -r hosts users flake.nix /mnt/etc/nixos/
-  else
-    echo "⏩ Skipping config file copy."
-  fi
-fi
+# --- COPY CONFIG FILES ---
+echo "🔧 Copying config files..."
+mkdir -p /mnt/etc/nixos/hosts
+mkdir -p /mnt/etc/nixos/users
+cp -r hosts users flake.nix /mnt/etc/nixos/
 
 # --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS ---
 file="/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
@@ -136,11 +119,9 @@ if [ ! -f "$file" ]; then
   echo "❌ Error: configuration.nix not found for host $HOSTNAME"
   exit 1
 fi
-
 echo "🔧 Updating configuration.nix with hashed passwords..."
 # Use sed to replace the password placeholder
 sed -i "s|password = \"PASSWORD_PLACEHOLDER\"|password = \"$USERHASH\"|" "$file"
-
 echo "✅ Password for user $USERNAME successfully updated."
 
 # --- INSTALL NIXOS ---
