@@ -27,7 +27,7 @@
   };
 
   # Users (with hashed password)
-  users.users.yourusername = {
+  users.users.def = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
     password = "PASSWORD_PLACEHOLDER";  # This will be replaced by the script
