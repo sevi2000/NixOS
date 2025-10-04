@@ -112,6 +112,7 @@ echo "🔧 Copying config files..."
 mkdir -p /mnt/etc/nixos/hosts
 mkdir -p /mnt/etc/nixos/users
 cp -r hosts users flake.nix /mnt/etc/nixos/
+cp hosts/abc/configuration.nix /mnt/etc/nixos/configuration.nix
 
 # --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS ---
 ls -R /mnt/etc/nixos
