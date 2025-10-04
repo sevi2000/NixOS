@@ -30,7 +30,7 @@
   users.users.yourusername = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
-    password = $(mkpasswd -m sha-512);  # Replace with `mkpasswd -m sha-512`
+    password = "PASSWORD_PLACEHOLDER";  # This will be replaced by the script
   };
 
   # Home Manager
