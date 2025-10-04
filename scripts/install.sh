@@ -3,8 +3,8 @@ set -euo pipefail
 
 # --- USER INPUT ---
 DISK="/dev/sda"          # CHANGE THIS to your disk (check with `lsblk`)
-HOSTNAME="abc"  # Your hostname
-USERNAME="def"  # Your username
+HOSTNAME="abc"           # Your hostname
+USERNAME="yourusername"  # Your username
 # -----------
 
 # Function to ask for confirmation
@@ -130,48 +130,16 @@ else
   fi
 fi
 
-# --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS (ROBUST) ---
+# --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS ---
 file="/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
-
 if [ ! -f "$file" ]; then
   echo "❌ Error: configuration.nix not found for host $HOSTNAME"
   exit 1
 fi
 
-echo "🔧 Updating configuration.nix with hashed passwords (robust)..."
-
-# Backup
-cp "$file" "$file.bak"
-
-awk -v user="$USERNAME" -v pass="$USERHASH" '
-BEGIN{in=0;found=0}
-{
-  if(!in){
-    print $0
-    if($0 ~ ("users\\.users\\."user"\\s*=\\s*\\{") || $0 ~ ("users\\.users\\.\""user"\"\\s*=\\s*\\{")) {
-      in=1; found=0
-    }
-  } else {
-    if($0 ~ /^[[:space:]]*password[[:space:]]*=/) {
-      print "  password = \""pass"\";";
-      found=1;
-      next;
-    }
-    if($0 ~ /^[[:space:]]*};[[:space:]]*$/) {
-      if(!found) print "  password = \""pass"\";";
-      print $0;
-      in=0; found=0;
-      next;
-    }
-    print $0;
-  }
-}
-END{
-  if(in && !found){
-    print "  password = \""pass"\";";
-    print "};"
-  }
-}' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+echo "🔧 Updating configuration.nix with hashed passwords..."
+# Use sed to replace the password placeholder
+sed -i "s|password = \"PASSWORD_PLACEHOLDER\"|password = \"$USERHASH\"|" "$file"
 
 echo "✅ Password for user $USERNAME successfully updated."
 
