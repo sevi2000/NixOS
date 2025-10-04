@@ -3,8 +3,8 @@ set -euo pipefail
 
 # --- USER INPUT ---
 DISK="/dev/sda"          # CHANGE THIS to your disk (check with `lsblk`)
-HOSTNAME="def"  # Your hostname
-USERNAME="abc"  # Your username
+HOSTNAME="yourhostname"  # Your hostname
+USERNAME="yourusername"  # Your username
 # -----------
 
 # Function to ask for confirmation
@@ -131,13 +131,13 @@ else
 fi
 
 # --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS ---
-if ! grep -q "$USERHASH" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"; then
+if ! grep -q "password =" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"; then
   echo "🔧 Updating configuration.nix with hashed passwords..."
-  sed -i "s/yourhashedpassword/$USERHASH/" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
+  sed -i "s|password = \".*\";|password = \"$USERHASH\";|" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
 else
   if confirm "Passwords already updated in configuration.nix. Update again?"; then
     echo "🔧 Updating configuration.nix with hashed passwords..."
-    sed -i "s/yourhashedpassword/$USERHASH/" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
+    sed -i "s|password = \".*\";|password = \"$USERHASH\";|" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
   else
     echo "⏩ Skipping password update."
   fi
@@ -161,3 +161,4 @@ else
 fi
 
 echo "✅ Installation complete! Reboot now."
+
