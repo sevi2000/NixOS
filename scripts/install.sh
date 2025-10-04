@@ -114,6 +114,7 @@ mkdir -p /mnt/etc/nixos/users
 cp -r hosts users flake.nix /mnt/etc/nixos/
 
 # --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS ---
+ls -R /mnt/etc/nixos
 file="/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
 if [ ! -f "$file" ]; then
   echo "❌ Error: configuration.nix not found for host $HOSTNAME"
