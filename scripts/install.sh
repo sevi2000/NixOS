@@ -3,8 +3,8 @@ set -euo pipefail
 
 # --- USER INPUT ---
 DISK="/dev/sda"          # CHANGE THIS to your disk (check with `lsblk`)
-HOSTNAME="abc"  # Your hostname
-USERNAME="def"  # Your username
+HOSTNAME="def"  # Your hostname
+USERNAME="abc"  # Your username
 # -----------
 
 # Function to ask for confirmation
@@ -44,6 +44,8 @@ ROOTPASS=$(get_password "root password")
 if lsblk -o FSTYPE "$DISK" | grep -q "vfat\|ext4"; then
   if confirm "$DISK is already partitioned and formatted. Re-partition and format?"; then
     echo "🔧 Re-partitioning $DISK..."
+    umount "${DISK}1" 2>/dev/null || true
+    umount "${DISK}2" 2>/dev/null || true
     sgdisk -Z "$DISK"  # Zap all partitions
     sgdisk -n 1:0:+512M -t 1:ef00 "$DISK"  # EFI partition
     sgdisk -n 2:0:0 -t 2:8300 "$DISK"      # Root partition
@@ -69,9 +71,10 @@ if ! mount | grep -q "/mnt "; then
   mount "${DISK}1" /mnt/boot/efi
 else
   if confirm "/mnt is already mounted. Remount?"; then
-    echo "🔧 Remounting disk..."
+    echo "🔧 Unmounting existing mounts..."
     umount /mnt/boot/efi 2>/dev/null || true
     umount /mnt 2>/dev/null || true
+    echo "🔧 Mounting disk..."
     mount "${DISK}2" /mnt
     mkdir -p /mnt/boot/efi
     mount "${DISK}1" /mnt/boot/efi
