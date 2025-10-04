@@ -3,8 +3,8 @@ set -euo pipefail
 
 # --- USER INPUT ---
 DISK="/dev/sda"          # CHANGE THIS to your disk (check with `lsblk`)
-HOSTNAME="def"  # Your hostname
-USERNAME="abc"  # Your username
+HOSTNAME="abc"  # Your hostname
+USERNAME="def"  # Your username
 # -----------
 
 # Function to ask for confirmation
