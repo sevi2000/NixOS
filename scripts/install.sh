@@ -63,7 +63,7 @@ else
   mkfs.ext4 "${DISK}2"
 fi
 
-# --- MOUNT DISK IF NOT ALREADY MOUNTED ---
+# --- MOUNT DISK ---
 if ! mount | grep -q "/mnt "; then
   echo "🔧 Mounting disk..."
   mount "${DISK}2" /mnt
@@ -89,7 +89,7 @@ if [ ! -f "/mnt/etc/nix/nix.conf" ] || ! grep -q "experimental-features" "/mnt/e
   mkdir -p /mnt/etc/nix
   echo "experimental-features = nix-command flakes" > /mnt/etc/nix/nix.conf
 else
-  if confirm "Nix Flakes are already enabled on the target system. Overwrite?"; then
+  if confirm "Nix Flakes are already enabled. Overwrite?"; then
     echo "🔧 Overwriting Nix Flakes configuration..."
     echo "experimental-features = nix-command flakes" > /mnt/etc/nix/nix.conf
   else
@@ -130,18 +130,50 @@ else
   fi
 fi
 
-# --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS ---
-if ! grep -q "password =" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"; then
-  echo "🔧 Updating configuration.nix with hashed passwords..."
-  sed -i "s|password = \".*\";|password = \"$USERHASH\";|" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
-else
-  if confirm "Passwords already updated in configuration.nix. Update again?"; then
-    echo "🔧 Updating configuration.nix with hashed passwords..."
-    sed -i "s|password = \".*\";|password = \"$USERHASH\";|" "/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
-  else
-    echo "⏩ Skipping password update."
-  fi
+# --- UPDATE CONFIGURATION.NIX WITH HASHED PASSWORDS (ROBUST) ---
+file="/mnt/etc/nixos/hosts/$HOSTNAME/configuration.nix"
+
+if [ ! -f "$file" ]; then
+  echo "❌ Error: configuration.nix not found for host $HOSTNAME"
+  exit 1
 fi
+
+echo "🔧 Updating configuration.nix with hashed passwords (robust)..."
+
+# Backup
+cp "$file" "$file.bak"
+
+awk -v user="$USERNAME" -v pass="$USERHASH" '
+BEGIN{in=0;found=0}
+{
+  if(!in){
+    print $0
+    if($0 ~ ("users\\.users\\."user"\\s*=\\s*\\{") || $0 ~ ("users\\.users\\.\""user"\"\\s*=\\s*\\{")) {
+      in=1; found=0
+    }
+  } else {
+    if($0 ~ /^[[:space:]]*password[[:space:]]*=/) {
+      print "  password = \""pass"\";";
+      found=1;
+      next;
+    }
+    if($0 ~ /^[[:space:]]*};[[:space:]]*$/) {
+      if(!found) print "  password = \""pass"\";";
+      print $0;
+      in=0; found=0;
+      next;
+    }
+    print $0;
+  }
+}
+END{
+  if(in && !found){
+    print "  password = \""pass"\";";
+    print "};"
+  }
+}' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+
+echo "✅ Password for user $USERNAME successfully updated."
 
 # --- INSTALL NIXOS ---
 if [ ! -f "/mnt/etc/NIXOS" ]; then
@@ -160,5 +192,4 @@ else
   fi
 fi
 
-echo "✅ Installation complete! Reboot now."
-
+echo "✅ Installation complete! You can now reboot."
