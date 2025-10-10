@@ -1,26 +1,29 @@
 {
-  description = "NixOS + Home Manager with 100% Nix-based Hyprland";
+  description = "Hyprland on Nixos";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    home-manager.url = "github:nix-community/home-manager";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
-    nixosConfigurations.abc = nixpkgs.lib.nixosSystem {
+  outputs = { self, nixpkgs, home-manager, ... }: {
+    nixosConfigurations.def = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        ./hosts/abc/configuration.nix
-        home-manager.nixosModules.home-manager {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
+        ./configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.tony = import ./home.nix;
+            backupFileExtension = "backup";
+          };
         }
       ];
-    };
-
-    homeConfigurations.def = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      modules = [ ./users/def/home.nix ];
     };
   };
 }
