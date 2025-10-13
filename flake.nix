@@ -1,5 +1,6 @@
-{ 
-  description = "Modular NixOS flake (final with Rust tools + Starship + Atuin)";
+{
+  description = "Modular NixOS flake (deploy-ready, Home Manager fzf/starship/atuin, default zsh)";
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -7,6 +8,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
   outputs = { self, nixpkgs, home-manager, ... }@inputs:
   let
     system = "x86_64-linux";
@@ -18,6 +20,7 @@
     nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = { inherit username hostname; };
+
       modules = [
         ./hosts/${hostname}/configuration.nix
         ./modules/system/users.nix

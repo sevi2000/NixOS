@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-GIT_REPO="${GIT_REPO:-https://github.com/<yourusername>/nixos-config.git}"
+GIT_REPO="https://github.com/sevi2000/NixOS.git"
 INSTALL_DIR="/mnt/etc/nixos"
 DISK=${1:-/dev/vda}
 HOSTNAME=${2:-def}
