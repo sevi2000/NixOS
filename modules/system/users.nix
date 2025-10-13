@@ -1,5 +1,4 @@
 { config, pkgs, username, ... }:
-
 {
   users.users.${username} = {
     isNormalUser = true;
@@ -8,6 +7,5 @@
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [];
   };
-
   programs.zsh.enable = true;
 }

@@ -1,20 +1,10 @@
 { pkgs, ... }:
-
 {
   environment.systemPackages = with pkgs; [
-    git
-    vim
-    neovim
-    firefox
-    vscode
-    curl
-    wget
-    htop
-    unzip
-
-    # LaTeX
+    git curl wget htop unzip vim neovim firefox vscode
+    temurin-jdk-21 maven gradle spring-boot-cli
+    python312 nodejs_22 gcc cmake
     texlive.combined.scheme-full
-    texlive.bin
-    texlive.format
+    btrfs-progs grub-btrfs
   ];
 }

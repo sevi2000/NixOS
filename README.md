@@ -1,31 +1,19 @@
-# NixOS Modular Flake - ready to push
+# NixOS Modular Flake - Final
 
-This repository is a modular NixOS flake prepared for one-step installation.
+This repo is a ready-to-push modular NixOS flake with:
+- Btrfs installer (subvolumes, zstd compression)
+- Hyprland desktop
+- Dev stacks (Java, Python, Node/React, Angular, C)
+- Neovim + LaTeX
+- Rust CLI tools (bat, fd, ripgrep, eza, dust, duf, procs, bottom, zoxide)
+- Starship prompt + Atuin history manager initialization
 
-Defaults baked in:
-- Disk default in installer: /dev/sda
-- Default username: abc
-- Default hostname: def
+Defaults:
+- Disk: /dev/vda
+- Username: abc
+- Hostname: def
 
-## Quick usage (from NixOS live ISO)
+## Install (from NixOS live ISO)
+sudo ./install.sh /dev/vda def abc
 
-Run the installer directly:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/<yourusername>/nixos-config/main/install.sh)
-```
-
-Or download and run:
-```bash
-wget https://raw.githubusercontent.com/<yourusername>/nixos-config/main/install.sh
-chmod +x install.sh
-sudo ./install.sh
-```
-
-Before running, edit `install.sh` to set `GIT_REPO` to your repo URL (or pass via environment variable):
-```bash
-GIT_REPO="https://github.com/yourusername/nixos-config.git" bash install.sh
-```
-
-## Structure
-See `modules/` for modular configuration (desktop, dev stacks, services, etc).
-
+Set GIT_REPO env var or edit install.sh to point to your repo URL before running.
