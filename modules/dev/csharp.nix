@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 {
   environment.systemPackages = with pkgs; [
-    vim git curl wget neovim htop tmux fzf ripgrep fd zsh starship atuin
+    dotnet-sdk_6
   ];
 }
 
