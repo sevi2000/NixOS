@@ -1,0 +1,5 @@
+{
+  username = "abc";
+  hostname = "hypr-minimal";
+  password = "Bekimdervishi";
+}
