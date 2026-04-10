@@ -8,7 +8,6 @@ DISK="${DISK:-/dev/sda}"  # Target disk
 USERNAME="${USERNAME:-alice}"  # Default username
 HOSTNAME="${HOSTNAME:-my-laptop}"  # Default hostname
 TIMEZONE="${TIMEZONE:-America/New_York}"  # Default timezone
-PASSWORD="${PASSWORD:-}"  # Leave empty to prompt during install
 
 # Check if running as root
 if [ "$(id -u)" != "0" ]; then
@@ -100,7 +99,7 @@ cat > flake.nix << EOL
           users.users.$USERNAME = {
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
-            $([ -n "$PASSWORD" ] && echo "initialPassword = \"$PASSWORD\";" || echo "# Set a password with: passwd $USERNAME")
+            # Set your password after installation with: passwd $USERNAME
           };
 
           # Minimal Packages
@@ -135,13 +134,8 @@ EOL
 # Install NixOS
 echo "Installing NixOS..."
 nix-env -iA nixpkgs.nixFlakes || true  # Ensure nixFlakes is installed
-if [ -n "$PASSWORD" ]; then
-  nixos-install --flake .#minimal --no-root-passwd
-else
-  nixos-install --flake .#minimal --no-root-passwd
-  echo "You will be prompted to set the password for $USERNAME during installation."
-fi
+nixos-install --flake .#minimal --no-root-passwd
 
 echo "Installation complete! Reboot with 'reboot' and log in as $USERNAME."
 echo "Start Hyprland with 'Hyprland' from TTY (Ctrl+Alt+F3)."
-echo "Change password with 'passwd' if using a temporary one."
+echo "Set your password after login with: passwd"
