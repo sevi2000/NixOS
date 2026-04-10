@@ -100,7 +100,7 @@ cat > flake.nix << EOL
           users.users.$USERNAME = {
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
-            ${if [ -n "$PASSWORD" ]; then "initialPassword = \"$PASSWORD\";" else "# Password will be prompted during install";}
+            $([ -n "$PASSWORD" ] && echo "initialPassword = \"$PASSWORD\";" || echo "# Set a password with: passwd $USERNAME")
           };
 
           # Minimal Packages

@@ -1,5 +1,5 @@
 {
-  username = "abc";
+  username = "myuser";
   hostname = "hypr-minimal";
-  password = "Bekimdervishi";
+  password = "changeme";
 }
