@@ -5,12 +5,10 @@
 
   environment.systemPackages = with pkgs; [
     hyprland
-    waybar
-    dunst
     wl-clipboard
     rofi-wayland
-    foot
-    grim slurp
+    grim
+    slurp
   ];
 
   services.greetd = {
@@ -23,7 +21,7 @@
     };
   };
 
-  environment.etc."xdg/config/hypr/hyprland.conf".text = ''
+  environment.etc."xdg/hypr/hyprland.conf".text = ''
     monitor=*,preferred,auto,1
     exec-once = swaybg -m fill /etc/nixos-hypr-minimal/wallpaper.jpg
     exec-once = waybar
