@@ -1,28 +1,29 @@
 {
-  description = "Minimal Hyprland + Neovim NixOS setup";
+  description = "NixOS from Scratch";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs.url = "nixpkgs/nixos-26.05";
+    home-manager = {
+      url = "github:nix-community/home-manager/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
-    let
+  outputs = { self, nixpkgs, home-manager, ... }: {
+    nixosConfigurations.zenbook = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-    in {
-      nixosConfigurations.minimal = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          ./hosts/default/configuration.nix
-          ./modules/system.nix
-          ./modules/user.nix
-          ./modules/hyprland.nix
-          ./modules/neovim.nix
-          ./modules/common.nix
-          home-manager.nixosModules.home-manager
-        ];
-      };
+      modules = [
+        ./configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.sese = import ./home.nix;
+            backupFileExtension = "backup";
+          };
+        }
+      ];
     };
+  };
 }
-
