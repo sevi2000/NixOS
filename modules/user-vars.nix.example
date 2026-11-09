@@ -1,5 +1,0 @@
-{
-  username = "myuser";
-  hostname = "hypr-minimal";
-  password = "changeme";
-}
