@@ -49,10 +49,14 @@ in
   ];
 programs.git = {
 	ernable = true;
-	userName = "Sevi Dervishi";
-	userEmnail = "sevidervishi@outlook.fr";
-	extraConfig = {
+
+  settings = {
+    user = {
+      name = "Sevi Dervishi";
+	    email = "sevidervishi@outlook.fr";
+      };
 	init.defaultBranch = "main";
+  push.autoSetupRemote = true;
 };
 };
 
